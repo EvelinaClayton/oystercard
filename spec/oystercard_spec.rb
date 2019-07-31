@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 require 'oystercard'
+require 'pry'
 
 describe Oystercard do
-  let(:entry_station){ double("station") }
-  let(:exit_station){ double("station") }
+  let(:entry_station) { double('station') }
+  let(:exit_station) { double('station') }
 
   it 'has a balance of 0' do
     oystercard = Oystercard.new
@@ -27,13 +28,9 @@ describe Oystercard do
     expect { subject.top_up 1 }.to raise_error(error_message)
   end
 
-  xit 'has a method deduct' do
-    expect(subject).to respond_to(:deduct).with(1).argument
+  it 'has a method touch_in' do
+    expect(subject).to respond_to(:touch_in)
   end
-
-  # it 'has a method touch_in' do
-  #   expect(subject).to respond_to(:touch_in)
-  # end
 
   it 'has a method touch_out' do
     expect(subject).to respond_to(:touch_out)
@@ -52,24 +49,23 @@ describe Oystercard do
   it 'can touch out' do
     subject.top_up(1)
     subject.touch_in(entry_station)
-    expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by(-Oystercard::MINIMUM_CHARGE)
+    expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::MINIMUM_CHARGE)
     subject.touch_out(exit_station)
     expect(subject).not_to be_in_journey
   end
 
   it 'will not touch in if below minimum balance' do
-    expect{ subject.touch_in(entry_station) }.to raise_error "Insufficient balance to touch in"
+    expect { subject.touch_in(entry_station) }.to raise_error 'Insufficient balance to touch in'
   end
-
 
   it 'will save entry and exit stations in journey' do
     subject.top_up(1)
     subject.touch_in(entry_station)
     subject.touch_out(exit_station)
-    expect(subject.journey). to eq ({ "entry" => entry_station, "exit" => exit_station })
+    expect(subject.all_journeys.first).to eq ({ touch_in: entry_station, touch_out: exit_station })
   end
 
   it 'has empty list called log by default' do
-    expect(subject.log).to be_empty
+    expect(subject.all_journeys).to be_empty
   end
 end
