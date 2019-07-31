@@ -24,7 +24,7 @@ describe Oystercard do
     expect { subject.top_up 1 }.to raise_error(error_message)
   end
 
-  it 'has a method deduct' do
+  xit 'has a method deduct' do
     expect(subject).to respond_to(:deduct).with(1).argument
   end
 
@@ -49,6 +49,7 @@ describe Oystercard do
   it 'can touch out' do
     subject.top_up(1)
     subject.touch_in
+    expect{ subject.touch_out }.to change{ subject.balance }.by(-Oystercard::MINIMUM_CHARGE) 
     subject.touch_out
     expect(subject).not_to be_in_journey
   end
