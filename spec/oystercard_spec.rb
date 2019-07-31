@@ -3,6 +3,9 @@
 require 'oystercard'
 
 describe Oystercard do
+  let(:entry_station){ double("station") }
+  let(:exit_station){ double("station") }
+
   it 'has a balance of 0' do
     oystercard = Oystercard.new
     expect(oystercard.balance).to eq 0
@@ -28,9 +31,9 @@ describe Oystercard do
     expect(subject).to respond_to(:deduct).with(1).argument
   end
 
-  it 'has a method touch_in' do
-    expect(subject).to respond_to(:touch_in)
-  end
+  # it 'has a method touch_in' do
+  #   expect(subject).to respond_to(:touch_in)
+  # end
 
   it 'has a method touch_out' do
     expect(subject).to respond_to(:touch_out)
@@ -42,26 +45,31 @@ describe Oystercard do
 
   it 'can touch in' do
     subject.top_up(1)
-    subject.touch_in 
-    expect(subject).to be_in_journey 
+    subject.touch_in(entry_station)
+    expect(subject).to be_in_journey
   end
 
   it 'can touch out' do
     subject.top_up(1)
-    subject.touch_in
-    expect{ subject.touch_out }.to change{ subject.balance }.by(-Oystercard::MINIMUM_CHARGE) 
-    subject.touch_out
+    subject.touch_in(entry_station)
+    expect{ subject.touch_out(exit_station) }.to change{ subject.balance }.by(-Oystercard::MINIMUM_CHARGE)
+    subject.touch_out(exit_station)
     expect(subject).not_to be_in_journey
   end
 
-  it 'will not touch in if below minimum balance' do 
-    expect{ subject.touch_in }.to raise_error "Insufficient balance to touch in"
+  it 'will not touch in if below minimum balance' do
+    expect{ subject.touch_in(entry_station) }.to raise_error "Insufficient balance to touch in"
   end
 
-  # In order to pay for my journey
-  # As a customer
-  # I need to know where I've travelled from
-  
 
+  it 'will save entry and exit stations in journey' do
+    subject.top_up(1)
+    subject.touch_in(entry_station)
+    subject.touch_out(exit_station)
+    expect(subject.journey). to eq ({ "entry" => entry_station, "exit" => exit_station })
+  end
+
+  it 'has empty list called log by default' do
+    expect(subject.log).to be_empty
+  end
 end
-
