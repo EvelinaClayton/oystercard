@@ -62,7 +62,7 @@ describe Oystercard do
     subject.top_up(1)
     subject.touch_in(entry_station)
     subject.touch_out(exit_station)
-    expect(subject.all_journeys.first).to eq ({ touch_in: entry_station, touch_out: exit_station })
+    expect(subject.all_journeys).to eq ([ entry_station, exit_station ])
   end
 
   it 'has empty list called log by default' do

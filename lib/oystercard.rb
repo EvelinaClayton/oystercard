@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative 'journey'
 
 class Oystercard
   attr_reader :balance, :currently_in_use, :all_journeys
@@ -11,8 +12,9 @@ class Oystercard
   def initialize(balance = DEFAULT_BALANCE)
     @balance = balance
     @currently_in_use = false
-    clear_stations
+    # clear_stations
     @all_journeys = []
+    @journey = Journey.new 
   end
 
   def top_up(amount)
@@ -26,31 +28,33 @@ class Oystercard
     raise 'Insufficient balance to touch in' if @balance < MINIMUM_BALANCE
 
     @currently_in_use = true
-    @entry_station = station
+    @journey.entry_station = station
   end
 
   def touch_out(station_name)
     deduct(MINIMUM_CHARGE)
     @currently_in_use = false
-    @exit_station = station_name
+    @journey.exit_station = station_name
     log_journey
   end
 
   def log_journey
-    @all_journeys << current_journey
+    @all_journeys << @journey.entry_station
+    @all_journeys << @journey.exit_station
     clear_stations
   end
 
-  def current_journey
-    {
-      touch_in: @entry_station,
-      touch_out: @exit_station
-    }
-  end
+#   def current_journey
+#     {
+#       touch_in: @entry_station,
+#       touch_out: @exit_station
+#     }
+#   end
 
   def clear_stations
-    @entry_station = nil
-    @exit_station = nil
+    # journey.current_journey = [] 
+    @journey.entry_station = nil
+    @journey.exit_station = nil
   end
 
   def in_journey?
